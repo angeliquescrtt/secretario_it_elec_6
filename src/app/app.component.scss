@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    min-height: 100vh; 
+    margin: 0; 
+}
+
+.container {
+    width: 50%;
+    height: auto; 
+    text-align: center;
+    padding: 20px;
+}
+
+h2 {
+    font-size: 40px;
+    color: black;
+}
