@@ -1,21 +1,32 @@
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center; 
     align-items: center; 
-    min-height: 100vh; 
     margin: 0; 
 }
 
 .container {
+    background-color: aliceblue;
     width: 50%;
     height: auto; 
     text-align: center;
     padding: 20px;
+    margin-bottom: 40px;
+    border-radius: 10px;
 }
 
 h2 {
-    font-size: 40px;
-    color: black;
+    font-size: 30px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: pink
+}
+
+.post-list {
+    width: 70%;
+    height: auto; 
+    text-align: center;
 }
 
 
