@@ -1,32 +1,22 @@
 body {
+    margin: 0;
+    width: 100%;
+    font-family: Arial, sans-serif;
+}
+
+main {
     display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    align-items: center; 
-    margin: 0; 
-}
-
-.container {
-    background-color: aliceblue;
-    width: 50%;
-    height: auto; 
-    text-align: center;
+    justify-content: space-between; 
+    align-items: stretch;
+    gap: 20px;
     padding: 20px;
-    margin-bottom: 40px;
-    border-radius: 10px;
+    max-width:  95%;
+    margin: 0 auto;
 }
 
-h2 {
-    font-size: 30px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: pink
-}
-
-.post-list {
-    width: 70%;
-    height: auto; 
-    text-align: center;
+app-post-create, app-post-list {
+    flex: 1; 
+    padding: 20px;
 }
 
 
