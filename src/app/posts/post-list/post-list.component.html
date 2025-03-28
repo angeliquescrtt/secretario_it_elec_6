@@ -1,13 +1,16 @@
 <mat-card>
     <mat-accordion multi="true" *ngIf="posts.length>=0">
-        <mat-expansion-panel *ngFor="let post of posts">
-            <mat-expansion-panel-header>{{post.title}}</mat-expansion-panel-header>
-            <p>{{post.content}}</p>
-            <mat-action-row>
-                <button mat-flat-button color="accent">Edit</button>
-                <button mat-flat-button color="accent" (click)="onDelete(post.id)">Delete</button>
-            </mat-action-row>
-        </mat-expansion-panel>
-    </mat-accordion>
-    <p *ngIf="posts.length<=0">No post added yet!</p>
+       <mat-expansion-panel *ngFor="let post of posts">
+           <mat-expansion-panel-header>{{post.title}}</mat-expansion-panel-header>
+           <div class= "post-image">  
+            <img [src]= "post.imagePath" [alt]= "post.title">  
+          </div>  
+           <P>{{post.content}}</P>
+           <mat-action-row>
+               <a mat-flat-button color="accent" [routerLink] = "['/edit',post.id]">EDIT</a>  
+               <button mat-flat-button color="accent"(click)="onDelete(post.id)">DELETE</button>
+           </mat-action-row>
+       </mat-expansion-panel>
+   </mat-accordion>
+   <p *ngIf="posts.length<=0"> No post added yet</p>
 </mat-card>

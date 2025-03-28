@@ -1,7 +1,27 @@
 .mat-toolbar{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
     background-color: #FFCDD2;
 }
+
+ul{  
+    list-style: none;  
+    padding: 0;  
+    margin: 0;  
+  }
+
+span a {
+  text-decoration: none;  
+    color: white;  
+    font-weight: bold;
+    font-size: 22px;
+}
+ li a{  
+    text-decoration: none;  
+    color: white;  
+    font-weight: bold;
+    font-size: 22px;
+  }
+
+.spacer{  
+    flex: 1 1 auto;  
+  }
+

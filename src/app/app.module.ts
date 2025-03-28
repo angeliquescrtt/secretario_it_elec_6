@@ -14,6 +14,9 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { HttpClientModule } from '@angular/common/http';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
+import { AppRoutingModule } from './app-routing.module';
+import { MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {ReactiveFormsModule} from '@angular/forms';  
 
 
 
@@ -42,6 +45,9 @@ import { MatButtonModule } from '@angular/material/button';
     MatInputModule,
     MatButtonModule,    
     HttpClientModule,
+    AppRoutingModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,  
 
   ],
   providers: [],

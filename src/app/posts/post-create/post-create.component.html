@@ -1,19 +1,28 @@
+<form [formGroup]="form" (submit)="onAddPost()" *ngIf="!isLoading">
+  <mat-form-field>
+    <input matInput type="text" formControlName="title" placeholder="Enter Title Here">
+    <mat-error *ngIf="form.get('title')?.invalid && form.get('title')?.touched">
+      This field is required (min 3 characters)
+    </mat-error>
+  </mat-form-field>
 
-<mat-card>
-    <form (submit)="onAddPost(postForm)" #postForm="ngForm">
-        <mat-form-field>
-            <input
-            matInput type="text"  name="title" ngModel required #title="ngModel" placeholder="Title">
-            <mat-error *ngIf="title.invalid"> "Enter a title</mat-error>
-        </mat-form-field>
-        <mat-form-field>
-            <textarea rows="6" matInput name="content"  ngModel="" required #content="ngModel"  placeholder="Content"></textarea>
-            <mat-error *ngIf="content.invalid">Enter a content</mat-error>
-        </mat-form-field>
-        <button  type="submit">Save</button>
-    </form>
-</mat-card>
+  <button mat-stroked-button type="button" class="pick-image-button" (click)="filepicker.click()">
+    Pick Image
+  </button>
+  <input type="file" #filepicker (change)="PickedImage($event)" accept="image/*" hidden>
 
+  <div class="image-preview" *ngIf="Pickedimage">
+    <img *ngIf="Pickedimage" [src]="Pickedimage" alt="Picked Image" class="image-preview">
+  </div>
 
+  <mat-form-field>
+    <textarea matInput rows="6" formControlName="content" placeholder="Enter Content Here"></textarea>
+    <mat-error *ngIf="form.get('content')?.invalid && form.get('content')?.touched">
+      Content is required
+    </mat-error>
+  </mat-form-field>
 
-
+  <button mat-raised-button color="accent" type="submit" [disabled]="form.invalid || isLoading">
+    {{ mode === 'edit' ? 'Update' : 'Save' }}
+  </button>
+</form>
