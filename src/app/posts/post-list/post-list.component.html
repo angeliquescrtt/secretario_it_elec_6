@@ -1,16 +1,155 @@
 <mat-card>
-    <mat-accordion multi="true" *ngIf="posts.length>=0">
-       <mat-expansion-panel *ngFor="let post of posts">
-           <mat-expansion-panel-header>{{post.title}}</mat-expansion-panel-header>
-           <div class= "post-image">  
-            <img [src]= "post.imagePath" [alt]= "post.title">  
-          </div>  
-           <P>{{post.content}}</P>
-           <mat-action-row>
-               <a mat-flat-button color="accent" [routerLink] = "['/edit',post.id]">EDIT</a>  
-               <button mat-flat-button color="accent"(click)="onDelete(post.id)">DELETE</button>
-           </mat-action-row>
-       </mat-expansion-panel>
-   </mat-accordion>
-   <p *ngIf="posts.length<=0"> No post added yet</p>
+  <mat-spinner *ngIf="Loading"></mat-spinner>
+
+  <div class="sort-section">
+  <label>Sort by Title:</label>
+  <select [(ngModel)]="sortOrder" (change)="onChangeSortOrder(sortOrder)">
+    <option value="asc">A - Z</option>
+    <option value="desc">Z - A</option>
+  </select>
+  </div>
+  
+  <div class="search-section">
+  <mat-form-field appearance="outline" style="width: 100%;">
+    <mat-label>Search Posts</mat-label>
+    <input matInput type="text" [(ngModel)]="searchTerm" (input)="onSearch(searchTerm)" placeholder="Search by title..." />
+    <button mat-icon-button matSuffix *ngIf="searchTerm" (click)="onSearch(''); searchTerm='';">
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+</div>
+
+
+
+  <mat-accordion multi="true" *ngIf="posts.length >= 0">
+    <mat-expansion-panel *ngFor="let post of filteredPosts">
+      <mat-expansion-panel-header>
+        {{ post.title }}
+      </mat-expansion-panel-header>
+
+      <div class="post-image">
+        <img [src]="post.imagePath + '?' + post.timestamp" [alt]="post.title" />
+      </div>
+      <p>{{ post.content }}</p>
+
+      <!-- Reaction and Comment Toggle Icons -->
+      <div class="post-actions">
+        <button mat-icon-button (click)="toggleReaction(post)">
+          <mat-icon [color]="post.reacted ? 'warn' : ''">favorite</mat-icon>
+        </button>
+        
+        <!-- Reaction count clickable to toggle list -->
+        <span
+          style="cursor: pointer; text-decoration: underline; color: blue;"
+          (click)="toggleShowReactors(post.id)"
+        >
+          {{ post.reactionCount || 0 }}
+        </span>
+
+        <!-- Show who reacted only if toggled for this post -->
+        <div *ngIf="showReactors[post.id] && post.reactions && post.reactions.length">
+          <span style="font-weight: bold;">Reacted by:</span>
+          <span *ngFor="let r of post.reactions; let last = last">
+            {{ r.userEmail }}<span *ngIf="!last">, </span>
+          </span>
+        </div>
+
+        <button mat-icon-button (click)="toggleComment(post.id)">
+          <mat-icon>chat_bubble_outline</mat-icon>
+        </button>
+      </div>
+
+
+      <!-- Comment Section (Initially Hidden) -->
+      <div class="comment-section" *ngIf="commentVisible[post.id]">
+        <form (ngSubmit)="addComment(post.id)">
+          <mat-form-field appearance="fill" style="width: 100%;">
+            <mat-label>Write a comment...</mat-label>
+            <input
+              matInput
+              [(ngModel)]="newComments[post.id]"
+              name="comment{{ post.id }}"
+              required
+            />
+          </mat-form-field>
+          <button mat-raised-button color="accent" type="submit">Post</button>
+        </form>
+
+        <div *ngIf="post.comments && post.comments.length > 0">
+          <h4>Comments:</h4>
+
+          <div class="comment-row" *ngFor="let comment of post.comments">
+            <div class="comment-content" *ngIf="editedCommentId !== comment.id">
+              <strong>{{ comment.userEmail }}</strong>: {{ comment.comment }}
+            </div>
+
+            <div class="comment-edit-container" *ngIf="editedCommentId === comment.id">
+              <mat-form-field appearance="fill" style="flex-grow: 1;">
+                <textarea
+                  matInput
+                  [(ngModel)]="editedCommentText"
+                  placeholder="Edit your comment"
+                  rows="2"
+                  required
+                ></textarea>
+              </mat-form-field>
+
+              <button
+                mat-button
+                color="primary"
+                (click)="saveEditedComment(post.id, comment.id!)"
+                [disabled]="!editedCommentText.trim()"
+                class="comment-edit-save"
+              >
+                Save
+              </button>
+              <button
+                mat-button
+                color="warn"
+                (click)="cancelEdit()"
+                class="comment-edit-cancel"
+              >
+                Cancel
+              </button>
+            </div>
+
+            <div class="comment-actions" *ngIf="editedCommentId !== comment.id">
+              <ng-container *ngIf="comment.userId === userId">
+                <button mat-button color="primary" (click)="editComment(post.id, comment)">
+                  Edit
+                </button>
+                <button mat-button color="warn" (click)="deleteComment(post.id, comment.id!)" [disabled]="!comment.id">
+                  Delete
+                </button>
+              </ng-container>
+
+              <ng-container *ngIf="comment.userId !== userId && post.creator === userId">
+                <button mat-button color="warn" (click)="deleteComment(post.id, comment.id!)" [disabled]="!comment.id">
+                  Delete
+                </button>
+              </ng-container>
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+        </div>
+      </div>
+
+      <!-- Edit/Delete Buttons -->
+      <mat-action-row *ngIf="userIsAuthenticated && userId === post.creator">
+        <a mat-flat-button color="accent" [routerLink]="['/edit', post.id]">EDIT</a>
+        <button mat-flat-button color="accent" (click)="onDelete(post.id)">DELETE</button>
+      </mat-action-row>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-paginator
+    [length]="totalposts"
+    [pageSize]="postperpage"
+    [pageSizeOptions]="pageSizeOption"
+    (page)="onChangedPage($event)"
+    *ngIf="posts.length > 0"
+  ></mat-paginator>
+
+  <p *ngIf="!Loading && posts.length <= 0">No post added yet</p>
 </mat-card>

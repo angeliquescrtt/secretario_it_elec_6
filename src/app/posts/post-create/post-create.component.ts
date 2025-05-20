@@ -11,12 +11,13 @@ import { mimetype } from "./mime-type.validator";
   styleUrls: ["./post-create.component.css"],
 })
 export class PostCreateComponent implements OnInit {
-  post: Post = { id: '', title: '', content: '', imagePath: '' };
+  // Initialize comments as empty array to satisfy interface
+  post: Post = { id: '', title: '', content: '', imagePath: '', comments: [] };
   mode = 'create';
-  postId: string | any;
+  postId: string | null = null;
   isLoading = false;
   form!: FormGroup;
-  Pickedimage: string | any;
+  Pickedimage: string | null = null;
 
   constructor(
     public postsService: PostsService,
@@ -46,22 +47,30 @@ export class PostCreateComponent implements OnInit {
           this.postsService.getPost(this.postId).subscribe((postData) => {
             this.isLoading = false;
             this.post = {
-              id: postData._id,
+              id: postData.id,
               title: postData.title,
               content: postData.content,
-              imagePath: postData.imagePath 
+              imagePath: postData.imagePath,
+              creator: postData.creator,
+              comments: (postData.comments || []).map((c: any) => ({
+                id: c.id,  
+                comment: typeof c === 'string' ? c : c.comment,
+                userId: c.userId ?? null,
+                userEmail: c.userEmail ?? null
+              }))
             };
             this.form.setValue({
               title: this.post.title,
               content: this.post.content,
-              image: this.post.imagePath 
+              image: this.post.imagePath
             });
+            this.Pickedimage = this.post.imagePath;  
           });
         }
       } else {
         this.mode = 'create';
         this.postId = null;
-        this.post = { id: '', title: '', content: '', imagePath: '' };
+        this.post = { id: '', title: '', content: '', imagePath: '', comments: [] };
       }
     });
   }
@@ -72,44 +81,40 @@ export class PostCreateComponent implements OnInit {
       console.log("No file selected");
       return;
     }
-  
+
     this.form.patchValue({ image: file });
     this.form.get("image")?.updateValueAndValidity();
-  
+
     const reader = new FileReader();
     reader.onload = () => {
-      this.Pickedimage = reader.result as string; 
+      this.Pickedimage = reader.result as string;
     };
     reader.readAsDataURL(file);
   }
-  
-  
 
   onAddPost() {
     if (this.form.invalid) {
       return;
     }
     this.isLoading = true;
-  
+
     if (this.mode === "create") {
       this.postsService.addPost(
         this.form.value.title,
         this.form.value.content,
-        this.form.value.image  
+        this.form.value.image
       );
     } else {
       this.postsService.updatePost(
         this.postId!,
         this.form.value.title,
         this.form.value.content,
-        this.form.value.image  
+        this.form.value.image
       );
     }
-  
+
     this.form.reset();
     this.Pickedimage = null;
     this.router.navigate(["/"]);
   }
-  
-  
 }

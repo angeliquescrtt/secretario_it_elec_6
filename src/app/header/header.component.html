@@ -4,9 +4,21 @@
             Posts 
           </a>  
     </span>
-    <ul>  
-        <li>  
-          <a mat-button routerLink = "/create"> Add Post</a>  
+    <ul>
+      <div class="auth">  
+      <li *ngIf = "userIsAuthenticated">  
+        <a mat-button routerLink = "/create" routerLinkActive = "mat-accent"> New Post</a>  
+      </li>  
+        <li *ngIf = "!userIsAuthenticated">  
+          <a mat-button routerLink = "/login" routerLinkActive = "mat-accent">Login</a>  
         </li>  
-    </ul> 
+        <li *ngIf = "!userIsAuthenticated">  
+          <a mat-button routerLink = "/signup" routerLinkActive = "mat-accent">Signup</a>  
+        </li>
+        <li *ngIf = "userIsAuthenticated">  
+          <a mat-button (click)= "onLogout()">Logout</a>  
+        </li>  
+      </div>   
+    </ul>
+
 </mat-toolbar>
